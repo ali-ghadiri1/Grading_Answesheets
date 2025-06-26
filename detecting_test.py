@@ -1,24 +1,25 @@
 import cv2
 import numpy as np
 
-# 📌 خواندن تصویر واقعی (بدون resize)
+# 📌 بارگذاری تصویر اصلی
 img = cv2.imread("responses/resp2.jpg")
 if img is None:
     print("❌ تصویر پیدا نشد.")
     exit()
 
 output = img.copy()
-alpha = 0.35  # شفافیت
+alpha = 0.35  # شفافیت رنگ‌ها
 
-# 🎨 رنگ‌ها (BGR)
+# 🎨 رنگ‌ها [شماره، A, B, C, D]
 colors = [
-    (255, 0, 0),    # آبی
-    (0, 0, 255),    # قرمز
-    (0, 255, 255),  # زرد
-    (50, 50, 50)    # مشکی
+    (160, 160, 160),  # شماره سوال (خاکستری)
+    (255, 0, 0),      # A - قرمز
+    (0, 0, 255),      # B - آبی
+    (0, 255, 255),    # C - زرد
+    (50, 50, 50)      # D - مشکی
 ]
 
-# مختصات بالا-چپ و بالا-راست بلوک‌های ردیف اول
+# 📍 مختصات بالا چپ و راست هر ستون از ردیف اول
 top_blocks = [
     ((86, 629), (302, 629)),
     ((371, 629), (587, 629)),
@@ -28,11 +29,26 @@ top_blocks = [
     ((1509, 629), (1725, 629)),
 ]
 
-block_height = 956 - 629     # 327px
-block_spacing = 9            # ✅ کاهش فاصله برای جا گرفتن بلوک پنجم
-blocks_per_column = 5        # ۵ ردیف بلوک
+# 🧩 مشخصات کلی
+block_height = 327
+block_spacing = 9
+blocks_per_column = 5
 
-# ترسیم بلوک‌ها
+# تنظیمات داخل هر بلوک
+padding_top_bottom = 19
+padding_right = 7
+padding_left = 10  # ← اصلاح برای جابجایی ۷px به چپ
+
+num_rows = 10
+num_cols = 5
+
+row_height = 17
+row_spacing = 13  # فاصله بین ردیف‌ها
+
+col_widths = [38, 26, 26, 26, 26]      # شماره، A-D
+col_spacings = [0, 6, 11, 13, 11]     # فاصله بین ستون‌ها (C-D اصلاح شد)
+
+# 🔄 ترسیم برای هر ستون و بلوک
 for col_idx, ((x1, y1), (x2, _)) in enumerate(top_blocks):
     block_w = x2 - x1
 
@@ -40,17 +56,29 @@ for col_idx, ((x1, y1), (x2, _)) in enumerate(top_blocks):
         y_top = y1 + blk * (block_height + block_spacing)
         y_bottom = y_top + block_height
 
-        top_left = (x1, y_top)
-        bottom_right = (x1 + block_w, y_bottom)
+        area_top = y_top + padding_top_bottom
+        area_left = x1 + padding_left
 
-        color_index = (col_idx + blk) % len(colors)
-        color = colors[color_index]
+        for row in range(num_rows):
+            # ✅ فاصله عمودی فقط بین ردیف‌ها، نه بالا و پایین کل
+            y_cell = int(area_top + row * row_height + row * row_spacing if row > 0 else area_top)
 
-        # ترسیم با شفافیت
-        overlay = output.copy()
-        cv2.rectangle(overlay, top_left, bottom_right, color, -1)
-        cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
+            x_cursor = area_left
+            for col in range(num_cols):
+                if col > 0:
+                    x_cursor += col_spacings[col]
 
-# ذخیره خروجی
-cv2.imwrite("blocks_final_fixed_spacing.jpg", output)
-print("✅ تصویر نهایی با فاصله عمودی 9px ذخیره شد: blocks_final_fixed_spacing.jpg")
+                cell_w = col_widths[col]
+                top_left = (int(x_cursor), int(y_cell))
+                bottom_right = (int(x_cursor + cell_w), int(y_cell + row_height))
+
+                color = colors[col % len(colors)]
+                overlay = output.copy()
+                cv2.rectangle(overlay, top_left, bottom_right, color, -1)
+                cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
+
+                x_cursor += cell_w
+
+# 💾 ذخیره تصویر نهایی
+cv2.imwrite("cell_layout_final_v2.jpg", output)
+print("✅ تصویر نهایی ذخیره شد: cell_layout_final_v2.jpg")
