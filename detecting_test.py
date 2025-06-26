@@ -48,19 +48,21 @@ row_spacing = 13  # فاصله بین ردیف‌ها
 col_widths = [38, 26, 26, 26, 26]      # شماره، A-D
 col_spacings = [0, 6, 11, 13, 11]     # فاصله بین ستون‌ها (C-D اصلاح شد)
 
+question_number = 1
+font = cv2.FONT_HERSHEY_SIMPLEX
+font_scale = 0.45
+thickness = 1
+
 # 🔄 ترسیم برای هر ستون و بلوک
 for col_idx, ((x1, y1), (x2, _)) in enumerate(top_blocks):
     block_w = x2 - x1
 
     for blk in range(blocks_per_column):
         y_top = y1 + blk * (block_height + block_spacing)
-        y_bottom = y_top + block_height
-
         area_top = y_top + padding_top_bottom
         area_left = x1 + padding_left
 
         for row in range(num_rows):
-            # ✅ فاصله عمودی فقط بین ردیف‌ها، نه بالا و پایین کل
             y_cell = int(area_top + row * row_height + row * row_spacing if row > 0 else area_top)
 
             x_cursor = area_left
@@ -77,8 +79,29 @@ for col_idx, ((x1, y1), (x2, _)) in enumerate(top_blocks):
                 cv2.rectangle(overlay, top_left, bottom_right, color, -1)
                 cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
 
+                # ✅ چاپ شماره سوال در ستون 0 (وسط‌چین و قرمز)
+                if col == 0:
+                    text = str(question_number)
+                    (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
+                    text_x = top_left[0] + (cell_w - text_width) // 2
+                    text_y = top_left[1] + (row_height + text_height) // 2 - 2  # کمی اصلاح پایین
+
+                    cv2.putText(
+                        output,
+                        text,
+                        (text_x, text_y),
+                        font,
+                        font_scale,
+                        (0, 0, 255),  # 🔴 قرمز
+                        thickness,
+                        cv2.LINE_AA
+                    )
+
                 x_cursor += cell_w
 
-# 💾 ذخیره تصویر نهایی
-cv2.imwrite("cell_layout_final_v2.jpg", output)
-print("✅ تصویر نهایی ذخیره شد: cell_layout_final_v2.jpg")
+            question_number += 1
+
+# ذخیره نهایی
+cv2.imwrite("cell_layout_with_centered_qnums.jpg", output)
+print("✅ شماره سوال‌ها قرمز و وسط‌چین شدند. ذخیره شد: cell_layout_with_centered_qnums.jpg")
+
