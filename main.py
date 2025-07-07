@@ -10,7 +10,7 @@ from layout import get_all_cells
 from alignment import align_form_using_markers
 from collections import defaultdict
 from header_reader import read_header_fields, read_header_fields, draw_header_regions
-
+from report_card import generate_report, save_report_json
 
 
 TEMP_DIR = "unzipped"
@@ -82,11 +82,11 @@ def process_all_from_zip():
             continue
 
         # 🔁 نرمال‌سازی با ۴ مارکر
-        aligned = align_form_using_markers(image)
-        if aligned is None:
-            print(f"⛔️ هم‌راستاسازی ممکن نبود: {filepath}")
-            continue
-        image = aligned  # تصویر نرمال‌شده را جایگزین می‌کنیم
+        # aligned = align_form_using_markers(image)
+        # if aligned is None:
+        #     print(f"⛔️ هم‌راستاسازی ممکن نبود: {filepath}")
+        #     continue
+        # image = aligned  # تصویر نرمال‌شده را جایگزین می‌کنیم
 
         base_name = os.path.splitext(os.path.basename(filepath))[0]
 
@@ -109,6 +109,18 @@ def process_all_from_zip():
         base_name = os.path.splitext(os.path.basename(filepath))[0]
         out_path = os.path.join(OUTPUT_DIR, f"{base_name}_graded.jpg")
         cv2.imwrite(out_path, visual)
+
+
+        # بعد از استخراج پاسخ‌ها و هدر
+        student_report = generate_report(
+            marked_answers,
+            answer_key,
+            header=header_data,
+            all_reports=None  # بعداً همه دانش‌آموزها رو بدی، رتبه هم محاسبه می‌کنه
+        )
+
+        save_report_json(student_report)
+
         print(f"✅ ذخیره شد: {out_path} (✔={correct} ✘={wrong} –={empty})")
 
 if __name__ == "__main__":
