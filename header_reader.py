@@ -1,9 +1,6 @@
-# header_reader.py
-
 import pytesseract
 import cv2
 
-# 📌 مختصات نواحی سربرگ (x1, y1, x2, y2)
 HEADER_FIELDS = {
     "full_name":      (717, 295, 717 + 366, 295 + 45),
     "school":         (726, 372, 726 + 465, 372 + 34),
@@ -16,7 +13,6 @@ HEADER_FIELDS = {
 }
 
 
-# اگر روی سیستم Tesseract نصب نکردی، این خط رو تنظیم کن:
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def read_header_fields(image):
@@ -40,7 +36,7 @@ def read_header_fields(image):
 
 def draw_header_regions(image):
     """
-    🔍 رسم مستطیل روی نواحی header جهت تست ناحیه‌بندی
+     رسم مستطیل روی نواحی header جهت تست ناحیه‌بندی
     """
     output = image.copy()
     font = cv2.FONT_HERSHEY_SIMPLEX
