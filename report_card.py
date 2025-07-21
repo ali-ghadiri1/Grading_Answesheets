@@ -1,5 +1,3 @@
-# report_card.py
-
 import json
 from subjects import SUBJECTS
 
@@ -14,7 +12,7 @@ def generate_report(marked, answer_key, header, all_reports=None):
     results = []
 
     for subj in SUBJECTS:
-        start = subj["start"] - 1  # تبدیل به اندیس
+        start = subj["start"] - 1
         end = subj["end"]
         coef = subj["coefficient"]
         total = end - start
@@ -70,7 +68,7 @@ def calculate_ranks(report, all_reports):
         school = report["header"].get("school")
         province = report["header"].get("province")
 
-        # نمرات از همان مدرسه و درس
+
         school_scores = [
             s["score"] for r in all_reports
             for s in r["results"]

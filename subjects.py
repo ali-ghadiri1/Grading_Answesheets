@@ -1,5 +1,3 @@
-# subjects.py
-
 SUBJECTS = [
     {
         "name": "استعداد تحلیلی",

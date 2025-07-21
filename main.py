@@ -1,5 +1,3 @@
-# main.py
-
 import cv2
 import os
 import zipfile
@@ -69,7 +67,7 @@ def process_all_from_zip():
                 image_files.append(full_path)
 
     if not image_files:
-        print("⚠️ هیچ تصویری یافت نشد!")
+        print(" هیچ تصویری یافت نشد!")
         return
 
     answer_key = get_answer_key()
@@ -78,27 +76,26 @@ def process_all_from_zip():
         print(f"🔍 پردازش: {filepath}")
         image = cv2.imread(filepath)
         if image is None:
-            print(f"❌ تصویر قابل خواندن نیست: {filepath}")
+            print(f" تصویر قابل خواندن نیست: {filepath}")
             continue
 
-        # 🔁 نرمال‌سازی با ۴ مارکر
         # aligned = align_form_using_markers(image)
         # if aligned is None:
-        #     print(f"⛔️ هم‌راستاسازی ممکن نبود: {filepath}")
+        #     print(f"️ هم‌راستاسازی ممکن نبود: {filepath}")
         #     continue
-        # image = aligned  # تصویر نرمال‌شده را جایگزین می‌کنیم
+        # image = aligned
 
         base_name = os.path.splitext(os.path.basename(filepath))[0]
 
 
-        # ⬛️ فقط برای تست: کشیدن نواحی هدر
+
         header_test = draw_header_regions(image)
         test_out_path = os.path.join(OUTPUT_DIR, f"{base_name}_header_debug.jpg")
         cv2.imwrite(test_out_path, header_test)
 
-        #خواندن هدر برگه
+        #reading the info in header
         header_data = read_header_fields(image)
-        print("📋 اطلاعات سربرگ:")
+        print(" اطلاعات سربرگ:")
         for k, v in header_data.items():
             print(f"  {k}: {v}")
 
@@ -111,17 +108,17 @@ def process_all_from_zip():
         cv2.imwrite(out_path, visual)
 
 
-        # بعد از استخراج پاسخ‌ها و هدر
+
         student_report = generate_report(
             marked_answers,
             answer_key,
             header=header_data,
-            all_reports=None  # بعداً همه دانش‌آموزها رو بدی، رتبه هم محاسبه می‌کنه
+            all_reports=None
         )
 
         save_report_json(student_report)
 
-        print(f"✅ ذخیره شد: {out_path} (✔={correct} ✘={wrong} –={empty})")
+        print(f" ذخیره شد: {out_path} (✔={correct} ✘={wrong} –={empty})")
 
 if __name__ == "__main__":
     process_all_from_zip()

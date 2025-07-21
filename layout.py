@@ -20,8 +20,8 @@ num_cols = 5
 row_height = 17
 row_spacing = 13
 
-col_widths = [38, 26, 26, 26, 26]      # شماره، A-D
-col_spacings = [0, 6, 11, 13, 11]      # دقیق‌ترین فاصله‌ها
+col_widths = [38, 26, 26, 26, 26]
+col_spacings = [0, 6, 11, 13, 11]
 
 def get_all_cells():
     """
